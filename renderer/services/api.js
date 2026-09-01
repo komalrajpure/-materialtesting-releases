@@ -23,17 +23,26 @@ const getAuthHeaders = () => {
   };
 };
 
+const requireAuthToken = () => {
+  if (typeof window === "undefined") {
+    throw new Error("Cannot access auth token on the server.");
+  }
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    throw new Error("You are not logged in. Please log in to continue.");
+  }
+  return token;
+};
+
 export const setAuthToken = (token) => {
   if (typeof window !== "undefined") {
     localStorage.setItem(TOKEN_KEY, token);
-    console.log("🔐 Token stored");
   }
 };
 
 export const setUserData = (userData) => {
   if (typeof window !== "undefined") {
     localStorage.setItem(USER_KEY, JSON.stringify(userData));
-    console.log("👤 User data stored");
   }
 };
 
@@ -54,7 +63,6 @@ export const logout = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
-    console.log("🚪 Logged out");
   }
 };
 
@@ -76,8 +84,6 @@ export const fetchDistrictTaluka = async () => {
 
   const data = await response.json();
   if (!response.ok) {
-    console.error("Status:", response.status);
-    console.error("Response:", data);
     throw new Error(data.error || `API Error: ${response.status}`);
   }
 
@@ -93,7 +99,6 @@ export const emailVerification = async (email) => {
     body: JSON.stringify({ email }),
   });
   const data = await response.json();
-  console.log("📧 EmailVerification:", data);
   if (!response.ok || !data.success) {
     throw new Error(data.message || "Email already exists or could not send OTP.");
   }
@@ -107,7 +112,6 @@ export const emailVerifyOtp = async (email, emailotp) => {
     body: JSON.stringify({ email, otp: emailotp }),
   });
   const data = await response.json();
-  console.log("✅ EmailVerifyOtp:", data);
   if (!response.ok || !data.success) {
     throw new Error(data.message || "Invalid email OTP. Please try again.");
   }
@@ -196,7 +200,6 @@ export const getMemberProfile = async (userId) => {
   }
 
   const data = await response.json();
-  console.log("👤 Member profile:", data);
 
   return data;
 };
@@ -228,8 +231,6 @@ export const registrationPhoneVerify = async ({
   type
 }) => {
 
-  console.log("🔐 Sending registration with type:", type);
-
   const response = await fetch(`${API_BASE_URL}/RegistrationPhoneverify`, {
     method: "POST",
     headers: getPublicHeaders(),
@@ -247,13 +248,10 @@ export const registrationPhoneVerify = async ({
   });
 
   const data = await response.json();
-  console.log("🆕 RegistrationPhoneverify:", data);
 
   if (!response.ok || !data.success) {
     throw new Error(data.message || "Registration failed. Please try again.");
   }
-
-console.log("Inspector created successfully");
 
 return data;
 };
@@ -282,7 +280,6 @@ const payload = {
   phoneNumber: Number(phoneNumber),
   otp: Number(otp),
 };
-console.log("📤 VERIFY PHONE PAYLOAD:", payload);
   const response = await fetch(`${API_BASE_URL}/verifyAndUpdateaccountPhone`, {
     method: "POST",
     headers: {
@@ -355,8 +352,6 @@ export const fetchTestData = async () => {
 
   const data = await response.json();
 
-  console.log("TEST API RESPONSE:", data);
-
   if (data?.totaltest?.items) {
     return data.totaltest.items;
   }
@@ -414,8 +409,6 @@ export const fetchDashboardData = async () => {
 export const fetchContractorMember = async (userId) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("📤 Fetching SignUp data for userId:", userId); // ✅ verify correct id
-
   const response = await fetch(
     `${API_BASE_URL}/Contractormembers?userId=${userId}`, // ✅ this is correct
     {
@@ -432,7 +425,6 @@ export const fetchContractorMember = async (userId) => {
   }
 
   const data = await response.json();
-  console.log("👷 Contractor API response:", data);
 
   return Array.isArray(data) ? data : [data];
 };
@@ -563,7 +555,6 @@ export const labNameVerification = async (labName) => {
     body: JSON.stringify({ labName }),
   });
   const data = await response.json();
-  console.log("🏷️ LabNameVerification:", data);
   return data;
 };
 
@@ -589,16 +580,11 @@ export const post_uploadReport = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const token = localStorage.getItem("auth_token");
-
-  const headers = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  const token = requireAuthToken();
 
   const response = await fetch(`${API_BASE_URL}/uploadReport`, {
     method: "POST",
-    headers,
+    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
 
@@ -639,37 +625,22 @@ export const post_uploadFilewithQR = async ({
   return data;
 };
 export const uploadReport = async (file) => {
-  console.log(
-    "📤 [UPLOAD REPORT] Uploading:",
-    file.name,
-    `(${(file.size / 1024).toFixed(1)} KB)`
-  );
-
   const formData = new FormData();
   formData.append("file", file);
 
-  const token = localStorage.getItem(TOKEN_KEY);
-
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const token = requireAuthToken();
 
   const response = await fetch(`${API_BASE_URL}/uploadReport`, {
     method: "POST",
-    headers,
+    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
 
-  console.log("[uploadReport] Status:", response.status);
-
   if (!response.ok) {
-    const errText = await response.text();
-    console.error("[uploadReport] Error:", errText);
     throw new Error(`Upload failed (${response.status})`);
   }
 
   const data = await response.json();
-
-  console.log("✅ [UPLOAD REPORT] Success:", data);
 
   // FIX: accept either fileUrl or publicUrl
   if (!data.fileUrl && !data.publicUrl) {
@@ -689,31 +660,22 @@ export const uploadReport = async (file) => {
  * Returns { fileUrl, publicUrl, qrCodeUrl }
  */
 export const uploadReportBlob = async (blob, fileName) => {
-  console.log("📤 [UPLOAD BLOB] Uploading QR-stamped PDF:", fileName);
-
   const formData = new FormData();
   formData.append("file", blob, fileName);
 
-  const token = localStorage.getItem(TOKEN_KEY);
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const token = requireAuthToken();
 
   const response = await fetch(`${API_BASE_URL}/uploadReport`, {
     method: "POST",
-    headers,
+    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
 
-  console.log("[uploadReportBlob] Status:", response.status);
-
   if (!response.ok) {
-    const errText = await response.text();
-    console.error("[uploadReportBlob] Error:", errText);
     throw new Error(`Blob upload failed (${response.status})`);
   }
 
   const data = await response.json();
-  console.log("✅ [UPLOAD BLOB] Success:", data);
   return data;
 };
 
@@ -723,28 +685,19 @@ export const uploadReportBlob = async (blob, fileName) => {
  * Body: { bookingId, fileUrl, editUrl }
  */
 export const submitReportWithQR = async ({ bookingId, fileUrl, editUrl, qrCodeUrl }) => {
-  console.log("📝 [SUBMIT REPORT] bookingId:", bookingId);
-  console.log("📝 [SUBMIT REPORT] fileUrl:", fileUrl);
-  console.log("📝 [SUBMIT REPORT] editUrl:", editUrl);
-  console.log("📝 [SUBMIT REPORT] qrCodeUrl:", qrCodeUrl);
-
   const response = await fetch(`${API_BASE_URL}/uploadFilewithQR`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ bookingId, fileUrl, editUrl, qrCodeUrl }),
   });
 
-  console.log("[submitReportWithQR] Status:", response.status);
-
   if (!response.ok) {
     const errJson = await response.json().catch(() => ({}));
     const errorMsg = errJson.error || errJson.message || `HTTP ${response.status}`;
-    console.error("[submitReportWithQR] Error:", errorMsg);
     throw new Error(errorMsg);
   }
 
   const data = await response.json();
-  console.log("✅ [SUBMIT REPORT] Success:", data);
   return data;
 };
 
@@ -777,16 +730,12 @@ export const getMembersStatus = async () => {
 
   const data = await response.json();
 
-  console.log("Members Status:", data);
-
   return data;
 };
 
 
 
 export const fetchInspectorDashboard = async () => {
-  console.log("📊 [INSPECTOR DASHBOARD] Fetching pending reports...");
-
   const response = await fetch(`${API_BASE_URL}/inspector_dashboard`, {
     method: "GET",
     headers: getAuthHeaders(),
@@ -798,7 +747,6 @@ export const fetchInspectorDashboard = async () => {
   }
 
   const data = await response.json();
-  console.log("✅ Raw API Response:", JSON.stringify(data, null, 2));
 
   let items = [];
   if (data?.totalTest?.items && Array.isArray(data.totalTest.items))   items = data.totalTest.items;
@@ -851,7 +799,6 @@ export const checkLabMemberLimit = async () => {
   const token = localStorage.getItem("auth_token");
 
   if (!token) {
-    console.error("No auth token found");
     return { memberExists: false };
   }
 
@@ -869,7 +816,6 @@ export const checkLabMemberLimit = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    console.error("API Error:", data);
     return { memberExists: false };
   }
 
@@ -895,8 +841,6 @@ export const fetchInspectorByLabName = async () => {
   }
 
   const data = await response.json();
-
-  console.log("👮 Inspector API:", data);
 
 return Array.isArray(data) ? data : [data];
 };

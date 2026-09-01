@@ -49,7 +49,6 @@ const AddMemberPage = () => {
       setConfirmDeleteId(null);
       window.location.reload();
     } catch (err) {
-      console.error(err);
       showMsg(err.message);
       setConfirmDeleteId(null);
     } finally {
@@ -61,7 +60,6 @@ const AddMemberPage = () => {
     const checkMember = async () => {
       try {
         const res = await checkLabMemberLimit();
-        console.log("API response:", res);
         if (res && res.allowed === false) {
           setMemberExists(true);
           const inspectors = await fetchInspectorByLabName();
@@ -70,7 +68,6 @@ const AddMemberPage = () => {
           }
         }
       } catch (err) {
-        console.error(err);
       } finally {
         setCheckingMember(false);
       }

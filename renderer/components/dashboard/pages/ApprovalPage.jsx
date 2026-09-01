@@ -44,33 +44,24 @@ const [tooltipVisible, setTooltipVisible] = useState({});
       setError(null);
       
       if (useMockData) {
-        console.log("📊 Using MOCK DATA for testing...");
         setRecords(MOCK_DATA);
       } else {
-        console.log("📊 Fetching from Dashboard API...");
-        
         try {
           // ✅ USE fetchDashboardData (same as Dashboard page - IT WORKS!)
           const data = await fetchInspectorDashboard();
-          console.log("✅ Inspector Dashboard Data:", data);
 
           if (!data || data.length === 0) {
-            console.warn("⚠️ No pending reports");
             setRecords([]);
           } else {
             setRecords(data);
           }
         } catch (apiErr) {
-          console.error("❌ API Error:", apiErr.message);
-          console.log("📊 Falling back to mock data...");
           setUseMockData(true);
           setRecords(MOCK_DATA);
         }
       }
     } catch (err) {
-      console.error("❌ Error loading reports:", err);
       setError(err.message);
-      console.log("📊 Falling back to MOCK DATA due to error...");
       setRecords(MOCK_DATA);
     } finally {
       setLoading(false);
@@ -304,8 +295,7 @@ await loadReports();
                     const isPending = r.status === "Done" && r.insepectorStatus === "In-Progress";
                     const isApproved = r.insepectorStatus === "Done" && r.status !== "reject";
                     const isRejected = r.status === "reject";
-                    console.log(r);
-                    
+
                     return (
                       <tr 
                         key={r.id} 

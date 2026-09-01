@@ -21,21 +21,13 @@ const DashboardPage = ({ isApproved }) => {
       setLoading(true);
 
       const raw = await fetchDashboardData();
-      console.log("FULL DASHBOARD DATA:", raw);
-      console.log("📊 Dashboard API Response:", raw);
-
-      console.log("🔍 RAW API RESPONSE:", JSON.stringify(raw, null, 2));
       const user = JSON.parse(localStorage.getItem("user_data"));
-      console.log("USER ID:", user._id);
 
       const transformed = transformApiData(raw || {});
-
-      console.log("🔍 TRANSFORMED DATA:", JSON.stringify(transformed, null, 2));
 
       setTests(transformed);
       setError(null);
     } catch (err) {
-      console.error("❌ Error loading dashboard:", err);
       setError(err.message);
       setTests([]);
     } finally {

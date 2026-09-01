@@ -202,13 +202,11 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
 
       // 4. Save to localStorage
       localStorage.setItem("user_data", JSON.stringify(userObj));
-      console.log("✅ Login successful:", userObj);
 
       // 5. Notify parent (index.jsx) — triggers routing by type
       if (onLogin) onLogin(userObj);
 
     } catch (err) {
-      console.error("❌ Login error:", err);
       setError(err.message || "Invalid OTP. Please try again.");
     } finally {
       setLoading(false);

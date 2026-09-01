@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import { getMemberStatus } from "../services/api";
 
-const useApprovalStatus = (activePage) => { 
-  const [isApproved, setIsApproved] = useState(null);
+const getCachedApproval = () => {
+  if (typeof window === "undefined") return null;
+  const stored = JSON.parse(localStorage.getItem("user_data") || "{}");
+  const rawStatus = stored?.approvalStatus ?? stored?.status ?? "";
+  return String(rawStatus).toLowerCase().trim() === "approved";
+};
+
+const useApprovalStatus = (activePage) => {
+  const [isApproved, setIsApproved] = useState(getCachedApproval);
 
   useEffect(() => {
     checkStatus();
@@ -22,7 +29,6 @@ const useApprovalStatus = (activePage) => {
       localStorage.setItem("user_data", JSON.stringify({ ...stored, approvalStatus: rawStatus }));
       setIsApproved(approved);
     } catch (err) {
-      console.error("Status check failed:", err);
       const stored = JSON.parse(localStorage.getItem("user_data") || "{}");
       const rawStatus = stored?.approvalStatus ?? stored?.status ?? "";
       setIsApproved(String(rawStatus).toLowerCase().trim() === "approved");

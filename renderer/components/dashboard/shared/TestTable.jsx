@@ -79,7 +79,6 @@ const TestTable = ({ tests = [] }) => {
                   <td style={{ padding: "13px 20px" }}>
                     <button
 onClick={() => {
-  console.log("Clicked", test);
   setSelectedTest(test);
 }}                      style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 10, fontSize: 11, fontWeight: 800, background: "linear-gradient(135deg,#f5c100,#e6a800)", color: "#1a0f00", border: "none", cursor: "pointer", boxShadow: "0 2px 8px rgba(245,193,0,0.3)", transition: "all 0.15s" }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 5px 14px rgba(245,193,0,0.4)"; }}

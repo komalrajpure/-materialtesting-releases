@@ -82,7 +82,6 @@ const [deleteId, setDeleteId] = useState(null);
   }))
 );
       } catch (err) {
-        console.error("❌ fetchTestData error:", err.message);
         setTableError(err.message);
       } finally {
         setTableLoading(false);
@@ -171,16 +170,13 @@ useEffect(() => {
   const handleEdit   = (row) => { setEditRow(row); setShowModal(true); };
 const handleDelete = async (id) => {
   if (!id) {
-    console.warn("handleDelete called with no id");
     return;
   }
   try {
-    console.log("Deleting ID:", id);
     await deleteTest(id);
     setRows((r) => r.filter((row) => row.id !== id));
     showToast("success", "Test deleted successfully.");
   } catch (err) {
-    console.error("❌ Delete failed:", err.message);
     showToast("error", "Delete failed: " + err.message);
   }
 };

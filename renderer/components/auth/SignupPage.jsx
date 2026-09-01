@@ -154,8 +154,6 @@ try {
     type: "Lab"  // ✅ Explicitly passing type
   });
 
-  console.log("✅ Signup success:", response);
-
   const token = response.token || response.authToken;
 
   if (token) {
@@ -176,7 +174,6 @@ try {
     };
 
     localStorage.setItem("user_data", JSON.stringify(userData));
-    console.log("✅ Signup saved user:", userData);
 
     if (onSignup) {
       onSignup({

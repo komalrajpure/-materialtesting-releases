@@ -19,8 +19,6 @@ const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
        const data = await fetchDashboardData();
 
-console.log("Dashboard API:", data);
-
 const items = data.totalTest?.items || [];
 
 const currentYear = new Date().getFullYear();
@@ -39,8 +37,6 @@ const monthlyReports = items.filter((item) => {
   const reportDate = new Date(rawDate);
 
   if (isNaN(reportDate)) return false;
-
-  console.log("REPORT DATE:", reportDate);
 
  return (
   reportDate.getMonth() === selectedMonth &&
@@ -85,7 +81,6 @@ setDashboardData({
   yearlyPayment: yearlyAmount
 });
       } catch (err) {
-        console.error("Dashboard error:", err);
       }
 
     };

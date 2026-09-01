@@ -33,11 +33,6 @@ const userType = String(rawType).trim().toLowerCase();
 
 const isInspector = userType === "inspector";
 
-console.log("USER TYPE:", userType);
-
-  console.log("🔍 User Type:", userType);
-  console.log("👤 User Data:", userData);
-
   // ⭐ BUILD MENU BASED ON TYPE
   let menuItems = [];
 

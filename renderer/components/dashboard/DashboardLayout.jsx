@@ -77,8 +77,6 @@ const DashboardLayout = ({ user, onLogout, defaultPage }) => {
   const [showPopup, setShowPopup]       = useState(false);
   const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
 
-console.log("USER TYPE:", user.type);
-
   // Normalise type
 const userType = String(
   userData.type || userData.role || userData.userType || user?.type || ""
@@ -86,8 +84,6 @@ const userType = String(
 const isInspector = String(userType).toLowerCase() === "inspector"; // ✅ Capital I
 
   // Approval status — inspectors skip this check entirely
-
-  console.log("🧑‍💼 userType:", userType, "| isApproved:", isApproved);
 
   /* -----------------------------------------
      SHOW POPUP IF LAB USER IS UNAPPROVED

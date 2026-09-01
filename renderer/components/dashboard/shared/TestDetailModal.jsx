@@ -80,21 +80,17 @@ const TestDetailModal = ({ test, onClose }) => {
 
   if (!test) return null;
 
-  console.log("MODAL TEST DATA:", test);
-
   const isApproved = test?.status?.toLowerCase() === "approved";
 
 useEffect(() => {
   const loadContractor = async () => {
     if (!test?.userId) {
-      console.log("❌ userId missing in test object:", test);
       return;
     }
     try {
       const data = await fetchContractorMember(test.userId);
       setContractor(data[0] || null); // ✅ first item from SignUp
     } catch (err) {
-      console.error("❌ Contractor fetch failed:", err.message);
     }
   };
   loadContractor();
@@ -129,7 +125,6 @@ useEffect(() => {
       const data = await uploadReport(file);
       clearInterval(progressInterval);
       const qrCodeUrl = makeQrUrl(data.publicUrl);
-      console.log("🔗 QR Code URL:", qrCodeUrl);
       setUploadProgress(100);
       setUploadedReport({
         fileUrl: data.fileUrl,
@@ -143,7 +138,6 @@ useEffect(() => {
       }, 500);
     } catch (error) {
       clearInterval(progressInterval);
-      console.error("Upload error:", error);
       setInlineError("Failed to upload file: " + error.message);
       setUploading(false);
       setUploadProgress(0);
@@ -170,7 +164,6 @@ useEffect(() => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Download error:", error);
       setInlineError("Failed to generate PDF with QR: " + error.message);
     } finally {
       setDownloading(false);
@@ -202,8 +195,6 @@ useEffect(() => {
         onClose();
       }, 1500);
     } catch (error) {
-      console.error("Submission error:", error);
-     
       setInlineError("Failed to submit report: " + error.message);
     } finally {
       setSubmitting(false);

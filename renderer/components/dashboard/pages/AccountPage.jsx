@@ -71,8 +71,7 @@ const [hoverField, setHoverField] = useState(null);
   if (userData) {
     try {
       const parsedUser = JSON.parse(userData);
-      console.log("📦 Loading user data from localStorage:", parsedUser);
-let extractedName = 
+let extractedName =
   parsedUser?.name ||
   parsedUser?.firstName ||
   parsedUser?.first_name ||
@@ -112,8 +111,6 @@ if (!parsedUser.name && extractedName) {
   };
 
   localStorage.setItem("user_data", JSON.stringify(updatedUser));
-
-  console.log("🔧 Fixed name in localStorage:", updatedUser);
 }
       setLabData((prev) => ({
         ...prev,
@@ -164,14 +161,8 @@ cancelChequePic:
     ? null
     : parsedUser?.chequePhoto || null,
       }));
-
-      console.log("✅ User data loaded successfully");
-    } catch (e) {
-      console.error("❌ Error parsing user data:", e);
-    }
-  } else {
-    console.warn("⚠️ No user_data found in localStorage");
-  }
+    } catch (e) {}
+  } else {}
 }, []);
 
 useEffect(() => {
@@ -195,9 +186,7 @@ useEffect(() => {
 
       setDistrictOptions(uniqueDistricts);
 
-    } catch (error) {
-      console.error("❌ DISTRICT FETCH ERROR:", error);
-    }
+    } catch (error) {}
   };
 
   loadDistrictData();
@@ -314,13 +303,11 @@ const removeFile = (field) => {
 
     try {
       const result = await SignupSendOtp(newPhoneNumber);
-      console.log("✅ OTP sent successfully:", result);
       setShowOTPModal(true);
       setOtpSent(true);
       setPhoneUpdateMessage("✓ OTP sent successfully to +91 " + newPhoneNumber);
 
     } catch (error) {
-      console.error("❌ Error sending OTP:", error);
       setPhoneUpdateError(error.message || "Failed to send OTP");
     } finally {
       setPhoneUpdateLoading(false);
@@ -328,7 +315,6 @@ const removeFile = (field) => {
   };
 
   const parsedUser = JSON.parse(localStorage.getItem("user_data"));
-  console.log("USER DATA:", parsedUser);
 
   // ========== STEP 2: VERIFY OTP AND UPDATE PHONE ==========
   const handleVerifyOTP = async () => {
@@ -343,7 +329,6 @@ const removeFile = (field) => {
 
     try {
    const parsedUser = JSON.parse(localStorage.getItem("user_data"));
-   console.log("USER DATA:", parsedUser);
 
 const userId =
   parsedUser?._id ||
@@ -359,15 +344,11 @@ if (!userId) {
         throw new Error("User not found. Please login again.");
       }
 
-      console.log("Verifying OTP with userId:", userId);
-
       const result = await updateAccountPhoneVerifyOtp({
         userId,
         phoneNumber: newPhoneNumber,
         otp: otpCode,
       });
-
-      console.log("✅ Phone updated successfully:", result);
 
       setLabData(prev => ({
         ...prev,
@@ -396,7 +377,6 @@ if (!userId) {
       }, 2000);
 
     } catch (error) {
-    console.error("❌ Error verifying OTP:", error);
     if (error.message?.toLowerCase().includes("expired")) {
         setOtpExpired(true);
     }
@@ -414,8 +394,6 @@ if (!userId) {
   const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
   const finalUserId = userData?._id;
 
-    console.log("TOKEN:", authToken);
-    console.log("USERID:", finalUserId);
     setLoading(true);
 
     try {
@@ -432,8 +410,6 @@ if (!authToken || !finalUserId) {
   setLoading(false);
   return;
 }
-
-      console.log("📤 Starting profile update...");
 
 let registrationDocUrl = null;
 let labApprovalDocUrl = null;
@@ -490,7 +466,6 @@ gstCertificate: gstCertificateDocUrl || userData?.gstCertificate,
 isoCertificate: isoCertificateDocUrl || userData?.isoCertificate,
 chequePhoto: cancelChequePicUrl || userData?.chequePhoto,
       };
-console.log("📤 Sending update to API:", payload);
 
 let response;
 
@@ -507,14 +482,12 @@ try {
     }
   );
 } catch (networkError) {
-  console.error("🚨 API ERROR:", networkError);
   setSubmitError("API request blocked. Backend CORS configuration required.");
   setLoading(false);
   return;
 }
 
 const result = await response.json();
-console.log("✅ API Response:", result);
 
       if (!response.ok) {
         throw new Error(result.message || "Update failed");
@@ -545,13 +518,11 @@ console.log("✅ API Response:", result);
       };
 
       localStorage.setItem("user_data", JSON.stringify(updatedUserData));
-      console.log("✅ Account updated successfully");
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
 
     } catch (error) {
-      console.error("❌ Error:", error);
       setSubmitError("Error: " + error.message);
     } finally {
       setLoading(false);
